@@ -3,42 +3,55 @@
 #include <string.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <sys/socket.h>
 
 int main(int argc, char *argv[]) {
+    // Check if the correct number of arguments are provided
     if (argc != 3) {
         fprintf(stderr, "Usage: %s host file\n", argv[0]);
         return 1;
     }
 
+    // Assign command line arguments to host and file variables
     char *host = argv[1];
     char *file = argv[2];
 
-    // Initialize address info hints
+    // Initialize and set up address info hints
     struct addrinfo hints, *res, *p;
-    memset(&hints, 0, sizeof(hints)); // Clear the structure
-    hints.ai_family = AF_INET; // Use IPv4
-    hints.ai_socktype = SOCK_DGRAM; // Datagram socket
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET; // IPv4 addresses
+    hints.ai_socktype = SOCK_DGRAM; // Datagram socket for UDP
 
-    // Get address information corresponding to the hostname
+    // Get address information corresponding to the provided host
     int status = getaddrinfo(host, NULL, &hints, &res);
     if (status != 0) {
         fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
         return 2;
     }
 
-    char ip[INET_ADDRSTRLEN]; // Buffer to store IP address
-    void *addr;
-    // Iterate through the linked list of address structures
-    for (p = res; p != NULL; p = p->ai_next) {
-        struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
-        addr = &(ipv4->sin_addr); // Get the address from the structure
-        inet_ntop(AF_INET, addr, ip, INET_ADDRSTRLEN); // Convert binary address to presentation form
+    int sockfd = -1;
+    // Iterate through available address info results to create a socket
+    if (res != NULL) {
+	    // Create a socket based on the address info
+	    sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+	    if (sockfd == -1) {
+		perror("socket");
+		// If socket creation fails, set sockfd to 0 
+		sockfd = 0;
+	    }
     }
 
-    printf("IP Address of %s is %s\n", host, ip); // Print the resolved IP address
+    // Check if socket creation failed
+    if (sockfd == -1) {
+        fprintf(stderr, "Failed to create socket\n");
+        return 3;
+    }
 
-    freeaddrinfo(res); // Free the memory allocated for address info
+    // Free memory allocated for address info
+    freeaddrinfo(res);
+    // Close Socket
+    close(sockfd);
 
-    return 0;
+    return 0; 
 }
 
