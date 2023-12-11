@@ -5,6 +5,10 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
+
+#define MAX_BUFFER_SIZE 516
+
+
 int main(int argc, char *argv[]) {
     // Check if the correct number of arguments are provided
     if (argc != 3) {
@@ -46,6 +50,21 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Failed to create socket\n");
         return 3;
     }
+    
+    char request[MAX_BUFFER_SIZE];
+    memset(request, 0, MAX_BUFFER_SIZE);
+    request[0] = 0x00;
+    request[1] = 0x01;
+    strcpy(&request[2], file);
+    request[strlen(file) + 3] = 0x00;
+    strcpy(&request[strlen(file) + 4], "octet");
+    request[strlen(file) + 5 + strlen("octet")] = 0x00;
+    
+    struct sockaddr *server_addr = res->ai_addr;
+    socklen_t addr_len = res->ai_addrlen;
+    sendto(sockfd, request, strlen(file) + strlen("octet") + 5, 0, server_addr, addr_len);
+
+
 
     // Free memory allocated for address info
     freeaddrinfo(res);
