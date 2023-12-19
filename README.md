@@ -1,4 +1,4 @@
-Pour le TP2 "Client TFTP", nous sommes arrivés à faire les questions de 1 à 5.a :
+Pour le TP2 "Client TFTP", nous sommes arrivés à faire les questions de 1 à 5.a et la question 8 :
 
 Qst 1 : Utilisation des arguments passés à la ligne de commande des programmes gettftp et puttftp pour obtenir les informations de requêtes (serveur et fichier)
 
@@ -17,6 +17,9 @@ Qst 4 : "Pour gettftp :
 Qst 5 : "Pour puttftp :
 
 	a) Construction d’une requête en écriture (WRQ) correctement formée, et envoi au serveur.
+
+8. Gestion de la pertes de paquets (et donc des acquittements) et des paquets d’erreur
+(ERR).
 
 Les commentaires sont mentionnés dans le fichier code.
 
